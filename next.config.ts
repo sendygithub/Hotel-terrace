@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "isi nanti"
 
+      },
+      {
+        protocol: 'https',
+        hostname: 'twxbisuimd7mxh3l.public.blob.vercel-storage.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

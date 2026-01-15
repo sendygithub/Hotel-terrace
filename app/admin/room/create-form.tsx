@@ -1,155 +1,161 @@
-"use client"
+"use client";
+
 import { IoCloudUploadOutline, IoTrashOutline } from "react-icons/io5";
-import { startTransition, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { BarLoader } from "react-spinners";
-import { type PutBlobResult } from "@vercel/blob";
+import type { PutBlobResult } from "@vercel/blob";
 import { Amenities } from "@/app/generated/prisma";
 
+type Props = {
+  amenities: Amenities[];
+};
 
-
-const CreateForm = ({amenities}:{amenities: Amenities[ ]}) => {
+const CreateForm = ({ amenities }: Props) => {
   const inputFileRef = useRef<HTMLInputElement>(null);
-  const [image, setImage] = useState("");
-  const [message, setMessage] = useState("");
-  const [pending, startTransition]= useTransition();
+  const [image, setImage] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
 
   const handleUpload = () => {
-    if (!inputFileRef.current?.files) return null;
-    const file = inputFileRef.current.files[0];
+    if (!inputFileRef.current?.files?.[0]) return;
+
     const formData = new FormData();
-    formData.set("file", file);
+    formData.set("file", inputFileRef.current.files[0]);
+
     startTransition(async () => {
       try {
-        const response = await fetch("/api/upload",
-          method : "PUT",
-          body : formData,
-        )
-      }
-      const data = await response.json();
-      if (response.status !== 200) {
-        setMessage(data.message);
-      }
-      const img = data as PutBlobResult;
-      setImage(img.url);
-    }catch (error) {
-      console.log(error); 
-      
-    }
-    )
-  }
+        const response = await fetch("/api/upload", {
+          method: "PUT",
+          body: formData,
+        });
 
-const deleteImage = (image: string) => {
-  startTransition(async () => {
-    try {
-      await fetch(`/api/upload/?imageUrl=${image}`, {
-        method: "DELETE",
-      });
-      setImage("");
-    } catch (error) {
-      console.log(error);
-      
+        const data = await response.json();
 
-    }
-  });
-};
+        if (!response.ok) {
+          setMessage(data.message ?? "Upload failed");
+          return;
+        }
+
+        const img = data as PutBlobResult;
+        setImage(img.url);
+        setMessage("");
+      } catch (error) {
+        console.error(error);
+        setMessage("Upload error");
+      }
+    });
+  };
+
+  const deleteImage = (url: string) => {
+    startTransition(async () => {
+      try {
+        await fetch(`/api/upload?imageUrl=${url}`, {
+          method: "DELETE",
+        });
+        setImage("");
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
+
   return (
-    <form action="">
-      <div className="grid md:grid-cols-12 gap5">
-        <div className="col-span-8 bg-white p-4">
-          <div className="mb-4">
-            <input
-              type="text"
-              name="name"
-              className="py-2 px-4"
-              rounded-sm
-              border-gray-400
-              w-full
-              placeholder="room name..."
-            />
-            <div aria-live="polite" aria-atomic="true">
-              <span className="text-sm text-red-500 mt-2"> message</span>
-            </div>
-          </div>
-          <div className="mb-4">
-            <textarea
-              name="description"
-              rows={8}
-              className="py-2 px-4"
-              rounded-sm
-              border-gray-400
-              w-full
-              placeholder="Description"
-            >
-              {" "}
-            </textarea>
-            <div className="mb-4 md:grid-cols-3">
+    <form className="grid md:grid-cols-12 gap-5">
+      {/* LEFT */}
+      <div className="col-span-8 bg-white p-4 space-y-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Room name"
+          className="w-full border border-gray-300 rounded-sm px-4 py-2"
+        />
+
+        <textarea
+          name="description"
+          rows={6}
+          placeholder="Description"
+          className="w-full border border-gray-300 rounded-sm px-4 py-2"
+        />
+
+        <div className="grid md:grid-cols-3 gap-3">
+          {amenities.map((item) => (
+            <label key={item.id} className="flex items-center gap-2">
               <input
-                type="checkboox"
+                type="checkbox"
                 name="amenities"
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                value={item.id}
+                className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 capitalize">
-                Spa
-              </label>
-              <div aria-live="polite" aria-atomic="true">
-                <span className="text-sm text-red-500 mt-2"> message</span>
-              </div>
-            </div>
-            <div aria-live="polite" aria-atomic="true">
-              <span className="text-sm text-red-500 mt-2"> message</span>
-            </div>
-          </div>
-          <div className="col-span-4 bg-white p-4">
-            <label
-              htmlFor="input-file"
-              className="flex flex-col mb-4 items-center justify-center aspect-video border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-500 relative"
-            >
-              <div className="flex flex-col items-center justify-center text-gray-500 pt-5 pb-6 z-10">
-                <div className="flex flex-col items-center justify-center">
-                  <IoCloudUploadOutline className="size-8" />
-                  <p className="mb-1 text-sm font-bold"> Select Image</p>
-                  <p> SVG,PNG,JPG,GIF,or Other(max:4mb)</p>
-                </div>
-              </div>
-              <input type="file" id="input-file" className="hidden" />
+              <span className="capitalize text-sm">{item.name}</span>
             </label>
-            <div className="mb-4">
-              <input
-                type="text"
-                name="capacity"
-                className="py-2 px-4"
-                rounded-sm
-                border-gray-400
-                w-full
-                placeholder="capacity"
-              />
-              <div aria-live="polite" aria-atomic="true">
-                <span className="text-sm text-red-500 mt-2"> message</span>
-              </div>
-            </div>
-            <div className="mb-4">
-              <input
-                type="text"
-                name="price"
-                className="py-2 px-4"
-                rounded-sm
-                border-gray-400
-                w-full
-                placeholder="Price. . ."
-              />
-              <div aria-live="polite" aria-atomic="true">
-                <span className="text-sm text-red-500 mt-2"> message</span>
-              </div>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="bg-orange-400 text-white w-full hover-orange-500 py-2.5 px-6 md:px-1 text-lg font-semibold cursor-pointer"
-          >
-            Save
-          </button>
+          ))}
         </div>
+      </div>
+
+      {/* RIGHT */}
+      <div className="col-span-4 bg-white p-4 space-y-4">
+        <label
+          htmlFor="input-file"
+          className="relative flex items-center justify-center aspect-video border-2 border-dashed rounded-md cursor-pointer"
+        >
+          {isPending && <BarLoader />}
+
+          {image ? (
+            <>
+              <button
+                type="button"
+                onClick={() => deleteImage(image)}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded"
+              >
+                <IoTrashOutline />
+              </button>
+              <Image
+                src={image}
+                alt="preview"
+                fill
+                className="object-cover rounded-md"
+              />
+            </>
+          ) : (
+            <div className="flex flex-col items-center text-gray-500">
+              <IoCloudUploadOutline className="text-3xl" />
+              <p className="text-sm font-semibold">Select Image</p>
+              <p className="text-xs">PNG, JPG, SVG (max 4MB)</p>
+            </div>
+          )}
+
+          <input
+            ref={inputFileRef}
+            id="input-file"
+            type="file"
+            hidden
+            onChange={handleUpload}
+          />
+        </label>
+
+        {message && <p className="text-sm text-red-500">{message}</p>}
+
+        <input
+          type="number"
+          name="capacity"
+          placeholder="Capacity"
+          className="w-full border border-gray-300 rounded-sm px-4 py-2"
+        />
+
+        <input
+          type="number"
+          name="price"
+          placeholder="Price"
+          className="w-full border border-gray-300 rounded-sm px-4 py-2"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-orange-400 hover:bg-orange-500 text-white py-2 font-semibold rounded"
+        >
+          Save
+        </button>
       </div>
     </form>
   );

@@ -8,7 +8,7 @@ declare module "next-auth" {
   }
 }
 
-const protectedRoutes = ["/myreservations", "/checkout", "/admin"];
+const protectedRoutes = ["/myreservations", "/checkout"];
 
 export async function middleware(request: NextRequest) {
     const session = await auth();
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     if (!isLoggedIn && protectedRoutes.some((route) => pathname.startsWith(route))){
         return NextResponse.redirect(new URL("/signin", request.url));
     }
-    if(isLoggedIn && role !== "admin" && pathname.startsWith("/admin")) {
+    if(isLoggedIn && role !== "admin" && pathname.startsWith("/adminul")) {
         return NextResponse.redirect(new URL("/", request.url))
     }
     if (isLoggedIn && pathname.startsWith("/signin")) {

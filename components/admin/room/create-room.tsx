@@ -3,6 +3,8 @@ import { getAmenities } from '@/lib/data';
 
 const CreateRoom = async() => {
   const amenities =await getAmenities();
+  console.log('Amenities:', amenities);
+
   if (!amenities) return null;
 
   return (

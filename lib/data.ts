@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma"
 import { auth } from "@/auth";
-import { error } from "console";
 
 export const getAmenities = async () => {
   const session = await auth();
