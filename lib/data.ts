@@ -14,3 +14,18 @@ export const getAmenities = async () => {
     console.log(error);
   }
 };
+
+
+
+
+export async function getRooms() {
+  return await prisma.room.findMany({
+    include: {
+      RoomAmenities: {
+        include: { Amenities: true },
+      },
+      Reservations: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}

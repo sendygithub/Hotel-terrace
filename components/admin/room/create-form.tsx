@@ -54,8 +54,49 @@ const CreateForm = ({ amenities }: CreateFormProps) => {
     })
   }
 
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.currentTarget);
+
+  const name = formData.get("name")?.toString() || "";
+  const description = formData.get("description")?.toString() || "";
+  const price = Number(formData.get("price"));
+  const capacity = Number(formData.get("capacity"));
+  const amenitiesSelected = formData.getAll("amenities") as string[];
+
+  try {
+    const res = await fetch("/api/rooms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        description,
+        image,
+        price,
+        capacity,
+        amenities: amenitiesSelected,
+      }),
+    });
+
+    if (!res.ok) throw new Error("Failed to save room");
+
+    const data = await res.json();
+    alert("Room created successfully!")
+    // Reset form
+    e.currentTarget.reset();
+    setImage("");
+  } catch (error) {
+    console.error(error);
+    alert("Error creating room");
+  }
+}
+
+
   return (
-    <form className="space-y-18 mt-10">
+    <form className="space-y-18 mt-10" onSubmit={handleSubmit}>
       {/* Room Name & Description */}
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-4">
@@ -87,7 +128,7 @@ const CreateForm = ({ amenities }: CreateFormProps) => {
                 >
                   <input
                     type="checkbox"
-                    name="amenities"
+                    name="Amenities"
                     value={item.id}
                     className="w-4 h-4 text-orange-500 border-gray-300 rounded"
                   />

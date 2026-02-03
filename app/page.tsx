@@ -1,8 +1,6 @@
 import Hero from "@/components/navbar/Hero"
-import Card from "@/components/navbar/card";
 import Main from "@/components/main";
-import contactform from "@/components/contactform";
-import Headersection from "@/components/header-section";
+
 
 
 export default function Home() {
