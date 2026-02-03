@@ -1,7 +1,17 @@
+
+//ini server side component
 import Link from "next/link";
 import RoomTable from "@/components/admin/room/room-table";
+import prisma from "@/lib/prisma";
 
-const Roompage = () => {
+
+export default async function RoomPage() {
+const rooms = await prisma.room.findMany({
+    orderBy:{id:'asc'},
+    }
+  );
+
+
   return (
     <div className="max-w-screen-xl px-4 py-16 mt-10 mx-auto">
       <div className="flex items-center justify-between">
@@ -14,9 +24,9 @@ const Roompage = () => {
           Create New
         </Link>
       </div>
-      <RoomTable />
+      <RoomTable rooms={rooms} />
     </div>
   );
 };
 
-export default Roompage;
+

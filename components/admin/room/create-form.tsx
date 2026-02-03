@@ -56,10 +56,11 @@ const CreateForm = ({ amenities }: CreateFormProps) => {
 
 
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
-  const formData = new FormData(e.currentTarget);
+  const form = e.currentTarget;
+  const formData = new FormData(form);
 
   const name = formData.get("name")?.toString() || "";
   const description = formData.get("description")?.toString() || "";
@@ -83,16 +84,24 @@ const CreateForm = ({ amenities }: CreateFormProps) => {
 
     if (!res.ok) throw new Error("Failed to save room");
 
-    const data = await res.json();
-    alert("Room created successfully!")
-    // Reset form
-    e.currentTarget.reset();
+    // ✅ reset HTML form
+    form.reset();
+
+    // ✅ reset React state
     setImage("");
+
+    // ✅ reset file input
+    if (inputFileRef.current) {
+      inputFileRef.current.value = "";
+    }
+
+    alert("Room created successfully!");
   } catch (error) {
     console.error(error);
     alert("Error creating room");
   }
-}
+};
+
 
 
   return (
