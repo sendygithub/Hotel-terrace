@@ -6,15 +6,12 @@ import React from "react";
 import { BiPencil, BiTrash } from "react-icons/bi";
 import Image from "next/image";
 import { deleteRoom } from "@/app/admin/room/actions";
-import { EditRoomPage } from "@/app/admin/room/[id]/edit/page";
-import EditRoomForm from "@/app/admin/room/[id]/edit/edit-form";
+
 import Link from "next/link";
 
 export default function RoomTable({ rooms }: { rooms: Room[] }) {
 
-  interface Props {
-    rooms: Room[];
-  }
+ 
   return (
     <div className="bg-white p-4 mt-5 shadow-sm">
       <table className="w-full divide-y divide-gray-200">
