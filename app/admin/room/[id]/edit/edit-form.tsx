@@ -9,8 +9,8 @@ interface EditRoomFormProps {
 
 export default function EditRoomForm({ room }: EditRoomFormProps) {
   return (
-    <div className="flex justify-center px-4 mt-50">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-sm border p-6">
+    <div className="max-w-screen-xl px-50 py-10 mx-auto mt-35 mb-10">
+      <div className="items-center justify-between">
         
         <h2 className="text-xl font-semibold mb-6">
           Edit Room
